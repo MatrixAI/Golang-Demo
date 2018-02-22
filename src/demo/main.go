@@ -1,12 +1,12 @@
 package main
 
 import (
+	"demo/utilstring"
 	"fmt"
 	"github.com/pelletier/go-toml"
-	"demo/utilstring"
 )
 
-func main () {
+func main() {
 	config, _ := toml.Load(`
         [postgres]
         user = "cmcdragonkai"

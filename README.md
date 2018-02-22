@@ -101,4 +101,23 @@ Ok...
 
 Afterwards you can do this: `go install example`, which puts the resulting binary into your `bin/example`. If you have this ignored, then it works great! Or while you're inside `example`, you can just run `go install`.
 
+---
+
+Ensuring dependencies:
+
+```
+dep init
+dep ensure -add github.com/pelletier/go-toml
+dep ensure
+```
+
+Right now dep is the most "official" package manager.
+
+However our way of structuring our go package in order to work with nix means we keep the entire bin/pkg/src in our repository, while ignoring bin and pkg. This does mean any other user who would want to use our code as a library, and if we were to expose the it as a library, would require to import: `github.com/MatrixAI/go-repo/src/package`. And then use `package.Func` in hteir code. It's not that bad, and we get integration into Nix!
+
+So this creates a development environment for `shell.nix`, if you wanted to export the application itself, you would write a `default.nix` which uses `go2nix` to get everything.
+
+Alternatively, go packages don't have nix, and then you wrap it in a submodule in a main repository that you work from. That way things can use the submodule, or use your main module. But maintaining submodules does require a bit of work, since you may need to synchronise it. It means you have something like `go-repo`, and then `nix-go-repo` that wraps it and works with as a submodule. So you would have to use the nix repo when working in nix, and you just wrap the main thing, then others can import `github.com/go-repo/packagename`.
+
+https://imagej.net/Git_submodule_tutorial is also good, as it shows how to do this with submodules.
 
