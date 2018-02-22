@@ -121,3 +121,4 @@ Alternatively, go packages don't have nix, and then you wrap it in a submodule i
 
 https://imagej.net/Git_submodule_tutorial is also good, as it shows how to do this with submodules.
 
+You can still use `go get` here.
