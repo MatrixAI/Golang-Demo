@@ -5,109 +5,6 @@ This is an example Golang project using Nix to setup a development environment.
 
 This relies on using Go 1.11 or above, as we don't use `GOPATH` global workspace style. Instead this is project based as that fits into Nix better. However a shared global workspace is mediated via the Nix system instead.
 
-Check if there are headers and stuff to include? And other environment variables to acquire.
-
----
-
-Figure out how to use `buildGoPackage` or `buildGo19Package`, since that relies on GOPATH, and this will not use it.
-
-Because Go relies on DNS to acquire dependencies. The main thing is that go modules can do this now with `go.mod` file. And it still acquire dependencies using the DNS.
-
-
-Looks like though some of it can be handled by nix. Where nix is basically used to specify the actual dependencies, build up an isolated GOPATH workspace and build everything from there. Except for IPFS like go packages which work with gx, which does it completely different thing lol.
-
-Ok so there's a new tool called dep that seems to be the official experiment for a vendoring tool.
-
-As the guy from google says, he preferred godep instead, so we can use that for vendoring, and it apparently it automatically figures out the gopath as well. Every go dev has their own packaging tool which requires a completely different system LOL.
-
-dep 0.4.1 has been released I wonder if we can get this.
-
-So apparently we can have a subdir under `$GOPATH/src/myproject` and that is good enough as well.
-
-Wait apparently we can treat the GOPATH as a single project. However dep does not yet suppor this. That means `$GOPATH/src` is the root.
-
-So we should be a ble to set that as the root. But still this means our nix-shell launches from within?
-
-So let's say we have a directory with src in it. Our repo is now dual in a way. Well... now I'm not sure.
-
-So we have to have GOPATH/src/projectname/main.go.
-
-Unfortunately we don't have GOPATH/src/main.go.
-
-The `dep` is still 0.3.1.
-
-Oh GOPATH is actually capable of referring to multiple areas. Like `/path:/path`. Which can refer to other go dependencies, which are each their own workspace.
-
-You can see that within the repo, src and shit are actually there. LOL.
-
-So that should mean there's a .gitignore file that ignores the bin and pkg.
-
-Yep that's exactly it!
-
-Oh so yea...
-
-So we just need to point our GOPATH to here as well?
-
-Oh so we can just use our pkg normally and get packages from the outside as well.
-
-So you do need `example` as well.
-
-Ok so we create a `src/example` which doesn't have anything else. So we use this as the full repository. Within this project we use `dep init`. (Remember we had to set the current directory as our GOPATH directory as well).
-
-So no we have example. And inside we have `vendor` and `Gopkg.lock` and `Gopkg.toml`.
-
-Nix's go has a package hook as well.
-
-So this is a dep example, but any IPFS code would have to be gx, but I don't even want to touch that atm.
-
-Conventionally the main file is also the same name as the package name.
-
-So the package name might be `example`, then the main file would be `example/example.go`. Not `main.go`, but inside there would be `package main` with a `main ()` function.
-
-However if it is a library, instead you would use `package example` and then just declare normal functions.
-
-So may have combined libraries and applications, you would have `example/example.go` as the main app, and `example/utility.go` as your libaries. Not sure if it's in the same package namespace.
-
-It appears that the package namespace can be the name of the directory that contains the files.
-
-Go by default uses tabs with tab width of 8.
-
-Ok...
-
-Afterwards you can do this: `go install example`, which puts the resulting binary into your `bin/example`. If you have this ignored, then it works great! Or while you're inside `example`, you can just run `go install`.
-
----
-
-Ensuring dependencies:
-
-```
-dep init
-dep ensure -add github.com/pelletier/go-toml
-dep ensure
-```
-
-Right now dep is the most "official" package manager.
-
-However our way of structuring our go package in order to work with nix means we keep the entire bin/pkg/src in our repository, while ignoring bin and pkg. This does mean any other user who would want to use our code as a library, and if we were to expose the it as a library, would require to import: `github.com/MatrixAI/go-repo/src/package`. And then use `package.Func` in hteir code. It's not that bad, and we get integration into Nix!
-
-So this creates a development environment for `shell.nix`, if you wanted to export the application itself, you would write a `default.nix` which uses `go2nix` to get everything.
-
-Alternatively, go packages don't have nix, and then you wrap it in a submodule in a main repository that you work from. That way things can use the submodule, or use your main module. But maintaining submodules does require a bit of work, since you may need to synchronise it. It means you have something like `go-repo`, and then `nix-go-repo` that wraps it and works with as a submodule. So you would have to use the nix repo when working in nix, and you just wrap the main thing, then others can import `github.com/go-repo/packagename`.
-
-https://imagej.net/Git_submodule_tutorial is also good, as it shows how to do this with submodules.
-
-You can still use `go get` here.
-
----
-
-Ok so we are using Go 1.11 modules here. It appears to assume that `go.mod` is located at the root directory. What exactly does that mean here? Let's see what happens.
-
-
-```
-GOROOT=/home/cmcdragonkai/Downloads/go /nix/store/d54amiggq6bw23jw6mdsgamvs6v1g3bh-glibc-2.25-123/lib64/ld-linux-x86-64.so.2 /home/cmcdragonkai/Downloads/go/bin/go
-```
-
-For tests, we are just going to do the above and initialise the module here.
 
 It automatically uses the github remote origin. Otherwise you have the name it accordingly. Still I don't like it, because now we are relying on the code knowing where it is located. Then again the problem is that you don't control that name. Well.. I guess you don't control the NPM name either, so it's really any different. Which is why it makes sense to use a blockchain eventually to do this to be really between people, and therefore I think eventually Polykey will lead to that.
 
@@ -115,79 +12,11 @@ It automatically uses the github remote origin. Otherwise you have the name it a
 go init module
 ```
 
-Now when you run build what does it actually build? Can you build a single piece of code without a main function? I think the main function is about building executables. What about libraries? I think the package main can be a standard.
-
-```
-So the package name might be `example`, then the main file would be `example/example.go`. Not `main.go`, but inside there would be `package main` with a `main ()` function.
-
-However if it is a library, instead you would use `package example` and then just declare normal functions.
-
-So may have combined libraries and applications, you would have `example/example.go` as the main app, and `example/utility.go` as your libaries. Not sure if it's in the same package namespace.
-```
-
-You do something like `demo` directory. Inside a `package main`, and a `main.go`.
-
-What are you building? There should be a `demo.go`. In there, what is the package. It should be `package main`. So do we separate the 2?
-
-When you do `go build` on a directory with a `go.mod`, it uses the module name as the name of the output. You need the main package with the main function. If you don't have the main package, nothing will happen. The main package MUST have the `main` function. It takes the basename of your package and builds it. For packages it builds silently and discards results, to see if it builds and typechecks. It's like stack build for a library in a way. It always stores it into the current directory. So you want to ignore things? `go build -o bin/elf`. It always only builds 1 executable! What if you have multiple executables to buid?
-
-Because they inherit the name of the directory they are in. Using main.go is the way to go for that. However an alternative way is to use bin and just build them directly, in which case they will use the name of the file itself. I think that makes more sense than naming them both main.go in their own directory.
-
-```
-go build -o bin/hello bin/hello.go
-go build -o bin/world bin/world.go
-```
-
-There you go. Multiple binaries in the same place.
-
 Note that the `package` namespace IS not the same as the module name, the module name is just any DNS, but usually the basename is the same name. But that's not necessarily true.
-
----
-
-Now any file that exists on the project root level represents the top level namespace. All go files should have the same namespace here, and this represents the name of the actual package. Whereas the module name is the `go.mod` name.
-
-Now how do you import?
-
-Note that when you import, at the top level you must use the module name (which is the DNS name)
-
-So ok, that's why I had to import by the module name. Because otherwise it was not able to find it. Now that name could be demo. But the module name is meant to be "globally" addressable. In the case of other code, they are using the DNS link. We could use `matrix.ai/...`.
-
----
-
-
-[[constraint]]
-  name = "github.com/pelletier/go-toml"
-  version = "1.1.0"
-
-```
-
-	config, _ := toml.Load(`
-        [postgres]
-        user = "cmcdragonkai"
-        password = "blah"
-	`)
-	user := config.Get("postgres.user").(string)
-	user = utilstring.Reverse(user)
-	user = reverse(user)
-	fmt.Println(fmt.Sprintf("Hello World %s", user))
-```
-
----
-
-
 
 * https://scene-si.org/2018/01/25/go-tips-and-tricks-almost-everything-about-imports/
 
 We should always alias our imports to be more stable, otherwise it just uses the package namespace name.
-
-Also our libraries should be named `go-toml`. Or something like that.
-
-Note that, it will still use the default `GOPATH` called `~/go` on Linux systems. This will cache the installation of the dependencies. Alternatively you can set `GOPATH=./.go` to ensure that you can get your own dependency versions there to isolate it into the project. Actually you can use `$(pwd)`. Since `.` really means the same thing in the shell.nix, well wherever the shell is running. But pwd as well. It's just that nix ensurs that it's in wherever the file it is located. The reason you don't do that is because it brings the entire directory in as a dependency. Becuase it thinks you may refer to it.
-
-If ou do this the GOPATH cannot be set like that. So weird! It has to be outside the GOPATH. So you have to enable GO111MODULES.
-
-I see now. But usually you have to change it over. This ensures it can be put here.
-
 
 This is the PR with go 1.11
 
