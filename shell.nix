@@ -18,6 +18,8 @@
         export GOCACHE=""
         export GO111MODULE='on'
 
+        go mod download
+
         set +v
       '';
     })
