@@ -1,17 +1,23 @@
 {
-  pkgs ? import (fetchTarball https://github.com/NixOS/nixpkgs-channels/archive/d09e425aea3e09b6cec5c7b05cc0603f6853748b.tar.gz) {}
+  pkgs ? import ./pkgs.nix,
+  goPath ? "go_1_11"
 }:
   with pkgs;
-  stdenv.mkDerivation {
-    name = "docker-demo";
-    buildInputs = [ go dep ];
-    shellHook = ''
-      echo 'Entering Docker Demo Environment'
-      set -v
+  let
+    go = lib.getAttrFromPath (lib.splitString "." goPath) pkgs;
+    drv = import ./default.nix { inherit pkgs goPath; };
+  in
+    drv.overrideAttrs (attrs: {
+      src = null;
+      buildInputs = [ govers ] ++ attrs.buildInputs;
+      shellHook = ''
+        echo 'Entering ${attrs.name}'
+        set -v
 
-      export GOPATH="$GOPATH:$(pwd)"
-      export PATH="$PATH:$(pwd)/bin"
+        export GOPATH="$(pwd)/.go"
+        export GOCACHE=""
+        export GO111MODULE='on'
 
-      set +v
-    '';
-  }
+        set +v
+      '';
+    })
