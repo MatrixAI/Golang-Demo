@@ -1,7 +1,7 @@
 package main
 
 import (
-	substringpackage "demo/substringpackage"
+	substringpackage "github.com/MatrixAI/Golang-Demo/substringpackage"
 	"fmt"
 )
 

@@ -1,8 +1,8 @@
 package demo
 
 import (
-	submathpackage "demo/submathpackage"
-	substringpackage "demo/substringpackage"
+	submathpackage "github.com/MatrixAI/Golang-Demo/submathpackage"
+	substringpackage "github.com/MatrixAI/Golang-Demo/substringpackage"
 	toml "github.com/pelletier/go-toml"
 )
 

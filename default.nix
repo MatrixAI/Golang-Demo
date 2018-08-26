@@ -10,7 +10,7 @@
     buildGoPackage {
       name = "golang-demo";
       version = "0.0.1";
-      goPackagePath = "demo";
+      goPackagePath = "github.com/MatrixAI/Golang-Demo";
       src = lib.cleanSourceWith {
         filter = (path: type:
           ! (builtins.any

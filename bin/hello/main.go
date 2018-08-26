@@ -1,7 +1,7 @@
 package main
 
 import (
-	demo "demo"
+	demo "github.com/MatrixAI/Golang-Demo"
 	"fmt"
 )
 

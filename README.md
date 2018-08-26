@@ -292,3 +292,5 @@ Yea I don't think it works. Go modules just live in an isolated way, there's no 
       #   }
       # ];
 ```
+
+Beware of `~/go` and `~/.cache/go-build` which is the default GOPATH and GOCACHE respectively. Note that we enable GOCACHE for the entire nix-shell development, but we isolate the GOPATH even with GO modules to avoid any kind of problems.
