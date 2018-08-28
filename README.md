@@ -76,3 +76,4 @@ We have not yet addressed Cgo where Golang binds to C libraries.
 * https://scene-si.org/2018/01/25/go-tips-and-tricks-almost-everything-about-imports/
 * https://github.com/NixOS/nixpkgs/archive/86c4c0699aad5331da6950dfa0727d19ddc3ce09.tar.gz
 * https://nixos.wiki/wiki/Go
+* https://github.com/NixOS/nixpkgs/tree/master/pkgs/tools/misc/lf
