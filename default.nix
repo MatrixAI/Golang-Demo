@@ -16,6 +16,7 @@
           ! (builtins.any
               (r: (builtins.match r (builtins.baseNameOf path)) != null)
               [
+                "\.env"
                 ".go"
               ])
         );
