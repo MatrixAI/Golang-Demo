@@ -1,3 +1,5 @@
 module github.com/MatrixAI/Golang-Demo
 
-require github.com/pelletier/go-toml v1.1.0
+go 1.13
+
+require github.com/pelletier/go-toml v1.6.0

@@ -1,26 +1,11 @@
-{
-  pkgs ? import ./pkgs.nix,
-  goPath ? "go_1_11"
+{ buildGoModule
+, nix-gitignore
 }:
-  with pkgs;
-  let
-    go = lib.getAttrFromPath (lib.splitString "." goPath) pkgs;
-    buildGoPackage = pkgs.buildGoPackage.override { inherit go; };
-  in
-    buildGoPackage {
-      name = "golang-demo";
-      version = "0.0.1";
-      goPackagePath = "github.com/MatrixAI/Golang-Demo";
-      src = lib.cleanSourceWith {
-        filter = (path: type:
-          ! (builtins.any
-              (r: (builtins.match r (builtins.baseNameOf path)) != null)
-              [
-                "\.env"
-                ".go"
-              ])
-        );
-        src = lib.cleanSource ./.;
-      };
-      goDeps = ./deps.nix;
-    }
+
+buildGoModule {
+  pname = "golang-demo";
+  version = "0.0.1";
+  src = nix-gitignore.gitignoreSource [] ./.;
+  goPackagePath = "github.com/MatrixAI/Golang-Demo";
+  modSha256 = "03977scgfx2mh1dm95f3g5mm5khib82cycn8q28dnk79k8a1g6yh";
+}
