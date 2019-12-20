@@ -7,5 +7,5 @@ buildGoModule {
   version = "0.0.1";
   src = nix-gitignore.gitignoreSource [] ./.;
   goPackagePath = "github.com/MatrixAI/Golang-Demo";
-  modSha256 = "03977scgfx2mh1dm95f3g5mm5khib82cycn8q28dnk79k8a1g6yh";
+  modSha256 = "1gqn2vm3wrc3gml8mhkf11sap3hkyzhi90qwzw0x93wv6vmm4mcy";
 }
