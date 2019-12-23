@@ -15,6 +15,8 @@ in
       export GOCACHE=""
       export GO111MODULE='on'
 
+      go mod init ${attrs.goPackagePath}
+
       set +v
     '';
   })
